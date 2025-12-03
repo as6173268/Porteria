@@ -19,7 +19,6 @@ const Index = () => {
   const navigate = useNavigate();
   const [strips, setStrips] = useState<ComicStrip[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentStripIndex, setCurrentStripIndex] = useState(0);
 
   useEffect(() => {
     loadStrips();
@@ -33,34 +32,12 @@ const Index = () => {
         .order("publish_date", { ascending: false });
 
       if (error) throw error;
-      
       setStrips(data || []);
-      setCurrentStripIndex(0); // Start with the latest strip
     } catch (error: any) {
       toast.error("Error al cargar tiras");
       console.error(error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handlePrevious = () => {
-    if (currentStripIndex < strips.length - 1) {
-      setCurrentStripIndex(currentStripIndex + 1);
-    }
-  };
-
-  const handleNext = () => {
-    if (currentStripIndex > 0) {
-      setCurrentStripIndex(currentStripIndex - 1);
-    }
-  };
-
-  const handleStripClick = (id: string) => {
-    const index = strips.findIndex(strip => strip.id === id);
-    if (index !== -1) {
-      setCurrentStripIndex(index);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -87,34 +64,30 @@ const Index = () => {
     );
   }
 
-  const currentStrip = strips[currentStripIndex];
+  const latestStrip = strips[0];
 
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       
       <main className="flex-grow">
-        {/* Today's strip - vertical format */}
+        {/* Latest strip */}
         <StripViewer
-          imageUrl={currentStrip.image_url}
-          date={currentStrip.publish_date}
-          title={currentStrip.title || undefined}
-          onPrevious={handlePrevious}
-          onNext={handleNext}
-          hasNext={currentStripIndex > 0}
-          hasPrevious={currentStripIndex < strips.length - 1}
+          imageUrl={latestStrip.image_url}
+          date={latestStrip.publish_date}
+          title={latestStrip.title || undefined}
         />
 
         {/* Archive slider */}
         {strips.length > 1 && (
           <ArchiveSlider
-            strips={strips.map(s => ({
+            strips={strips.slice(1).map(s => ({
               id: s.id,
               imageUrl: s.image_url,
               date: s.publish_date,
               title: s.title || undefined,
             }))}
-            onStripClick={handleStripClick}
+            onStripClick={(id) => navigate(`/archivo`)}
           />
         )}
 
