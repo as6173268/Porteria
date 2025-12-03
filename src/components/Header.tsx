@@ -30,10 +30,10 @@ const Header = () => {
               Sobre Mí
             </Link>
             <Link 
-              to="/contacto" 
+              to="/admin" 
               className="text-sm uppercase tracking-wider font-medium hover:opacity-60 transition-opacity"
             >
-              Contacto
+              Admin
             </Link>
           </nav>
           
