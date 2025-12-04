@@ -8,7 +8,31 @@
 
 ## 📋 Para Completar el Deployment al Repositorio Porteria:
 
-### Opción 1: Via Interfaz Web (Más Simple)
+### ⭐ Opción RECOMENDADA: GitHub Actions (Automatizado y Seguro)
+
+**¡Solo necesitas 3 pasos y estará listo! 🚀**
+
+1. **Crear Personal Access Token**:
+   - Ve a https://github.com/settings/tokens
+   - "Generate new token (classic)" → Scope: `repo` → Copy token
+
+2. **Configurar Secret**:
+   - Ve a este repo → Settings → Secrets → Actions
+   - "New repository secret" → Name: `TARGET_REPO_PAT` → Paste token
+
+3. **Ejecutar Deployment**:
+   - Push este código: `git push origin main`
+   - O ve a Actions → "Force Replace Deploy to Porteria" → Run workflow → Type `CONFIRM`
+
+**¡Y listo!** GitHub Actions hará todo automáticamente:
+- ✅ Build del proyecto 
+- ✅ Backup automático del repo Porteria
+- ✅ Deployment completo y seguro
+- ✅ GitHub Pages configurado
+
+---
+
+### Opción 1: Via Interfaz Web (Manual)
 1. Ve a https://github.com/albertomaydayjhondoe/Porteria
 2. Elimina todos los archivos del repositorio actual
 3. Sube todos los archivos de este proyecto (arrastra y suelta)
@@ -36,12 +60,23 @@ git commit -m "Deploy Daily Paper Comics - Complete application"
 git push origin main --force
 ```
 
-### Opción 3: Configurar GitHub Pages
-Una vez que los archivos estén en Porteria:
+### Opción 3: Configurar GitHub Pages (Automático con GitHub Actions)
+Si usaste GitHub Actions, las Pages se configuran automáticamente.
+Si deployaste manualmente:
 1. Ve a **Settings** → **Pages** en el repositorio Porteria
 2. Selecciona **Deploy from a branch**
 3. Escoge **main** branch y **/ (root)** folder
 4. La página estará disponible en: `https://albertomaydayjhondoe.github.io/Porteria/`
+
+---
+
+## 🎯 Resumen Rápido: ¡Solo 3 Pasos!
+
+1. **Token**: https://github.com/settings/tokens → `repo` scope
+2. **Secret**: Settings → Secrets → `TARGET_REPO_PAT` 
+3. **Deploy**: `git push origin main` o Actions → Run workflow
+
+**⏱️ Tiempo total: ~5 minutos** | **🤖 Trabajo manual: Mínimo** | **🛡️ Seguridad: Máxima**
 
 ## 📁 Archivos Preparados
 Todos los archivos están listos en: `/workspaces/porteria-deploy/`
