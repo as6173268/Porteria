@@ -93,7 +93,7 @@ const StripViewer = ({ strips }: StripViewerProps) => {
 
   return (
     <section className="py-16 px-6">
-      <div className="container mx-auto max-w-4xl">
+      <div className="container mx-auto max-w-6xl">
         {/* Header */}
         <div className="text-center mb-12 space-y-4">
           <div className="inline-block border-2 border-primary px-6 py-2">

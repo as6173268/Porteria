@@ -51,13 +51,45 @@ All colors MUST be HSL.
     /* Transitions */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
+
+  /* Dark theme as default */
+  html {
+    --background: 222 20% 8%;
+    --foreground: 40 100% 98%;
+    
+    --card: 222 20% 10%;
+    --card-foreground: 40 100% 98%;
+    
+    --popover: 222 20% 8%;
+    --popover-foreground: 40 100% 98%;
+    
+    --primary: 38 92% 65%;
+    --primary-foreground: 222 20% 8%;
+    
+    --secondary: 220 15% 18%;
+    --secondary-foreground: 40 100% 98%;
+    
+    --muted: 220 15% 18%;
+    --muted-foreground: 40 20% 70%;
+    
+    --accent: 30 80% 55%;
+    --accent-foreground: 222 20% 8%;
+    
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 0 0% 98%;
+    
+    --border: 38 50% 40%;
+    --input: 220 15% 18%;
+    --ring: 38 92% 65%;
+    
+    --shadow-newspaper: 0 2px 12px hsla(38, 92%, 50%, 0.15);
+    --shadow-editorial: 0 4px 24px hsla(38, 92%, 50%, 0.25);
+    
+    color-scheme: dark;
+  }
 }
 
 @layer base {
-  /* Force light mode */
-  html {
-    color-scheme: light;
-  }
   * {
     @apply border-border;
   }
@@ -69,6 +101,17 @@ All colors MUST be HSL.
   /* Editorial typography */
   h1, h2, h3, h4, h5, h6 {
     @apply font-serif;
+  }
+  
+  /* Wider container for dark theme */
+  .container {
+    max-width: 1400px;
+  }
+  
+  @media (min-width: 1536px) {
+    .container {
+      max-width: 1600px;
+    }
   }
 }
 
