@@ -5,24 +5,18 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  // For GitHub Pages: set to '/<repo-name>/' or '/' for custom domain
-  base: '/Porterias/',
+  base: mode === 'production' ? '/Porterias/' : '/',
   server: {
     host: "::",
     port: 8080,
   },
-  plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
+  plugins: [
+    react(),
+    mode === "development" && componentTagger(),
+  ].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-    },
-  },
-  build: {
-    outDir: 'dist',
-    rollupOptions: {
-      output: {
-        manualChunks: undefined,
-      },
     },
   },
 }));
