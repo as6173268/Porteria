@@ -18,7 +18,7 @@ async function generateOGImage() {
   ctx.fillRect(0, 0, width, height);
 
   // Borde superior con color primary
-  ctx.fillStyle = '#f59e0b';
+  ctx.fillStyle = '#9ca3af';
   ctx.fillRect(0, 0, width, 8);
 
   // Título "PAPERBOY"
@@ -40,7 +40,7 @@ async function generateOGImage() {
   ctx.fillText('con estilo minimalista tipo periódico', width / 2, 410);
 
   // Línea decorativa
-  ctx.strokeStyle = '#f59e0b';
+  ctx.strokeStyle = '#9ca3af';
   ctx.lineWidth = 3;
   ctx.beginPath();
   ctx.moveTo(width / 2 - 200, 460);

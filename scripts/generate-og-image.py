@@ -9,7 +9,7 @@ img = Image.new('RGB', (width, height), color='#0f172a')
 draw = ImageDraw.Draw(img)
 
 # Borde superior con color primary
-draw.rectangle([0, 0, width, 8], fill='#f59e0b')
+draw.rectangle([0, 0, width, 8], fill='#9ca3af')
 
 # Intentar cargar fuentes del sistema, si no usar default
 try:
@@ -53,7 +53,7 @@ draw.text((x, 400), text, fill='#cbd5e1', font=font_desc)
 
 # Línea decorativa
 line_y = 460
-draw.line([(width/2 - 200, line_y), (width/2 + 200, line_y)], fill='#f59e0b', width=3)
+draw.line([(width/2 - 200, line_y), (width/2 + 200, line_y)], fill='#9ca3af', width=3)
 
 # URL
 text = "albertomaydayjhondoe.github.io/Porterias"
