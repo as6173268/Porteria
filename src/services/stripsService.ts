@@ -22,9 +22,9 @@ interface StripsData {
  */
 export async function fetchStrips(): Promise<ComicStrip[]> {
   try {
-    // Fetch with timeout
+    // Fetch with timeout (3 seconds for local file)
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
     
     const response = await fetch('/data/strips.json', {
       signal: controller.signal

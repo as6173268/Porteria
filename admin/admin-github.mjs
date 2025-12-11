@@ -216,9 +216,11 @@ async function addStrip(args) {
   // Intentar commit automático
   let newContent;
   try {
+    // Validate data structure before serialization
+    if (!data || !Array.isArray(data.strips)) {
+      throw new Error('Invalid data structure');
+    }
     newContent = JSON.stringify(data, null, 2);
-    // Validate JSON
-    JSON.parse(newContent);
   } catch (error) {
     log('❌ Error al serializar datos JSON:', 'red');
     log('   No se hará commit automático', 'yellow');
@@ -291,9 +293,11 @@ async function removeStrip(args) {
   // Intentar commit automático
   let newContent;
   try {
+    // Validate data structure before serialization
+    if (!data || !Array.isArray(data.strips)) {
+      throw new Error('Invalid data structure');
+    }
     newContent = JSON.stringify(data, null, 2);
-    // Validate JSON
-    JSON.parse(newContent);
   } catch (error) {
     log('❌ Error al serializar datos JSON:', 'red');
     log('   No se hará commit automático', 'yellow');
