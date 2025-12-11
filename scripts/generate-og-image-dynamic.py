@@ -84,7 +84,7 @@ if latest_strip and latest_strip.get('image_url'):
         draw = ImageDraw.Draw(img)
         
         # Borde superior
-        draw.rectangle([0, 0, width, 6], fill='#f59e0b')
+        draw.rectangle([0, 0, width, 6], fill='#9ca3af')
         
         # Fuentes
         try:
@@ -141,7 +141,7 @@ if not latest_strip or not latest_strip.get('image_url'):
     img = Image.new('RGB', (width, height), color='#0f172a')
     draw = ImageDraw.Draw(img)
     
-    draw.rectangle([0, 0, width, 8], fill='#f59e0b')
+    draw.rectangle([0, 0, width, 8], fill='#9ca3af')
     
     try:
         font_title = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 100)
@@ -174,7 +174,7 @@ if not latest_strip or not latest_strip.get('image_url'):
     text_width = bbox[2] - bbox[0]
     draw.text(((width - text_width) / 2, 400), text, fill='#cbd5e1', font=font_desc)
     
-    draw.line([(width/2 - 200, 460), (width/2 + 200, 460)], fill='#f59e0b', width=3)
+    draw.line([(width/2 - 200, 460), (width/2 + 200, 460)], fill='#9ca3af', width=3)
     
     text = "albertomaydayjhondoe.github.io/Porterias"
     bbox = draw.textbbox((0, 0), text, font=font_url)

@@ -18,7 +18,7 @@ All colors MUST be HSL.
     --popover: 222 20% 8%;
     --popover-foreground: 40 100% 98%;
     
-    --primary: 38 92% 65%;
+    --primary: 220 9% 65%;
     --primary-foreground: 222 20% 8%;
     
     --secondary: 220 15% 18%;
@@ -27,18 +27,18 @@ All colors MUST be HSL.
     --muted: 220 15% 18%;
     --muted-foreground: 40 20% 70%;
     
-    --accent: 30 80% 55%;
+    --accent: 220 9% 55%;
     --accent-foreground: 222 20% 8%;
     
     --destructive: 0 62% 45%;
     --destructive-foreground: 0 0% 98%;
     
-    --border: 38 50% 40%;
+    --border: 220 9% 40%;
     --input: 220 15% 18%;
-    --ring: 38 92% 65%;
+    --ring: 220 9% 65%;
     
-    --shadow-newspaper: 0 2px 12px hsla(38, 92%, 50%, 0.15);
-    --shadow-editorial: 0 4px 24px hsla(38, 92%, 50%, 0.25);
+    --shadow-newspaper: 0 2px 12px hsla(220, 9%, 50%, 0.15);
+    --shadow-editorial: 0 4px 24px hsla(220, 9%, 50%, 0.25);
     
     color-scheme: dark;
   }
