@@ -112,7 +112,7 @@ async function mergeStrips() {
   
   // Combinar todos los strips
   const allStrips = [...existingData.strips, ...tsStrips];
-  log(`📊 Total de strips antes de deduplicar: ${allStrips.strips}`, 'cyan');
+  log(`📊 Total de strips antes de deduplicar: ${allStrips.length}`, 'cyan');
   
   // Deduplicar
   const deduplicated = deduplicateStrips(allStrips);

@@ -40,13 +40,7 @@ ADMIN_GH_TOKEN=your_github_token_here
 4. Value: Paste your GitHub token
 5. Click "Add secret"
 
-#### For Web-based Admin Panel:
-
-When you access the admin panel at `/admin`:
-
-1. Enter your GitHub token directly in the login form
-2. The token will be stored in the browser's session storage (not persisted)
-3. You'll need to enter it again after closing the browser
+**Note:** The current admin panel at `/admin` uses Supabase authentication. The ADMIN_GH_TOKEN is primarily for use with the command-line script and future GitHub API integrations.
 
 ## Usage
 
@@ -89,12 +83,13 @@ node scripts/admin.mjs help
 
 ### Using the Web Admin Panel
 
+The web admin panel is available at `/admin` and uses Supabase authentication. To access it:
+
 1. Navigate to `/admin` on the live site
-2. Log in with your GitHub token
-3. Use the web interface to:
-   - Upload new strips (automatically commits to GitHub)
-   - View all strips
-   - Delete strips (automatically commits to GitHub)
+2. Log in with your Supabase credentials (configured separately)
+3. The panel allows you to manage strips through the Supabase backend
+
+For direct GitHub integration and automated commits, use the command-line script described above.
 
 ## Security Notes
 
