@@ -8,8 +8,10 @@ export const SECURITY_CONFIG = {
   
   // File upload validation
   ALLOWED_IMAGE_TYPES: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
-  MAX_FILE_SIZE_MB: 5,
-  MAX_FILE_SIZE_BYTES: 5 * 1024 * 1024,
+  ALLOWED_VIDEO_TYPES: ['video/mp4', 'video/webm', 'video/ogg'],
+  ALLOWED_MEDIA_TYPES: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/webm', 'video/ogg'],
+  MAX_FILE_SIZE_MB: 50,
+  MAX_FILE_SIZE_BYTES: 50 * 1024 * 1024,
   
   // Input validation
   MAX_TITLE_LENGTH: 200,
@@ -52,7 +54,12 @@ export const validateDate = (date: string): boolean => {
 
 // File type validation
 export const validateFileType = (file: File): boolean => {
-  return SECURITY_CONFIG.ALLOWED_IMAGE_TYPES.includes(file.type);
+  return SECURITY_CONFIG.ALLOWED_MEDIA_TYPES.includes(file.type);
+};
+
+// Check if file is video
+export const isVideoFile = (file: File): boolean => {
+  return SECURITY_CONFIG.ALLOWED_VIDEO_TYPES.includes(file.type);
 };
 
 // File size validation
