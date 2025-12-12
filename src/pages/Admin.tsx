@@ -14,7 +14,8 @@ import {
   validateDate,
   validateFileType,
   validateFileSize,
-  generateSecureFilename
+  generateSecureFilename,
+  isVideoFile
 } from "@/lib/security";
 
 interface ComicStrip {
@@ -190,18 +191,16 @@ const Admin = () => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       
-      // Validate file type
-      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-      if (!allowedTypes.includes(file.type)) {
-        toast.error("Solo se permiten imágenes (JPG, PNG, GIF, WebP)");
+      // Validate file type (images and videos)
+      if (!validateFileType(file)) {
+        toast.error("Solo se permiten imágenes (JPG, PNG, GIF, WebP) y videos (MP4, WebM, OGG)");
         e.target.value = '';
         return;
       }
       
-      // Validate file size (max 5MB)
-      const maxSize = 5 * 1024 * 1024; // 5MB
-      if (file.size > maxSize) {
-        toast.error("La imagen no debe superar 5MB");
+      // Validate file size (max 50MB)
+      if (!validateFileSize(file)) {
+        toast.error(`El archivo no debe superar ${SECURITY_CONFIG.MAX_FILE_SIZE_MB}MB`);
         e.target.value = '';
         return;
       }
@@ -247,12 +246,17 @@ const Admin = () => {
         .from("comic-strips")
         .getPublicUrl(filePath);
 
+      // Determine media type
+      const mediaType = isVideoFile(selectedFile) ? 'video' : 'image';
+
       // Insert strip record
       const { error: insertError } = await supabase
         .from("comic_strips")
         .insert({
-          title: title || null,
+          title: sanitizedTitle || null,
           image_url: publicUrl,
+          video_url: mediaType === 'video' ? publicUrl : null,
+          media_type: mediaType,
           publish_date: publishDate,
         });
 
@@ -447,11 +451,11 @@ const Admin = () => {
 
               <div>
                 <label className="block text-sm font-medium mb-2 uppercase tracking-wider">
-                  Imagen de la Tira
+                  Imagen o Video de la Tira
                 </label>
                 <Input
                   type="file"
-                  accept="image/*"
+                  accept="image/*,video/*"
                   onChange={handleFileChange}
                   className="border-2 border-primary"
                   required
