@@ -30,6 +30,11 @@ const Admin = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  // If set to true, use the local server endpoints instead of Supabase
+  const useLocal = import.meta.env.VITE_USE_LOCAL_UPLOAD === 'true';
+  const [localToken, setLocalToken] = useState<string | null>(
+    typeof window !== 'undefined' ? window.localStorage.getItem('local_admin_token') : null
+  );
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
@@ -38,12 +43,25 @@ const Admin = () => {
   
   const [strips, setStrips] = useState<ComicStrip[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [destination, setDestination] = useState<'strip'|'video'|'pdf'>('strip');
   const [title, setTitle] = useState("");
   const [publishDate, setPublishDate] = useState(new Date().toISOString().split('T')[0]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   // Set up auth state listener
   useEffect(() => {
+    if (useLocal) {
+      setLoading(false);
+      if (localToken) {
+        setUser({ id: 'local', email: window.localStorage.getItem('local_admin_email') || '' } as any);
+        setIsAdmin(true);
+        loadStrips();
+      } else {
+        setIsAdmin(false);
+      }
+      return;
+    }
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setSession(session);
@@ -133,33 +151,67 @@ const Admin = () => {
     setAuthLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: email.trim().toLowerCase(),
-        password,
-      });
-
-      if (error) {
-        // Increment failed attempts
-        const newAttempts = loginAttempts + 1;
-        setLoginAttempts(newAttempts);
-        
-        // Lock after 5 failed attempts for 5 minutes
-        if (newAttempts >= 5) {
-          setLockoutTime(Date.now() + 5 * 60 * 1000);
-          toast.error("Demasiados intentos fallidos. Bloqueado por 5 minutos");
-        } else {
-          toast.error("Credenciales incorrectas");
+      if (useLocal) {
+        // Local login using server endpoint
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email.trim().toLowerCase(), password })
+        });
+        const j = await res.json();
+        if (!res.ok) {
+          const newAttempts = loginAttempts + 1;
+          setLoginAttempts(newAttempts);
+          if (newAttempts >= 5) {
+            setLockoutTime(Date.now() + 5 * 60 * 1000);
+            toast.error('Demasiados intentos fallidos. Bloqueado por 5 minutos');
+          } else {
+            toast.error('Credenciales incorrectas');
+          }
+          throw new Error('Credenciales incorrectas');
         }
-        throw error;
+
+        // store small token locally
+        window.localStorage.setItem('local_admin_token', j.token);
+        window.localStorage.setItem('local_admin_email', email.trim().toLowerCase());
+        setLocalToken(j.token);
+        setUser({ id: 'local', email: email.trim().toLowerCase() } as any);
+        setIsAdmin(true);
+        setLoginAttempts(0);
+        setLockoutTime(null);
+        toast.success('Sesión iniciada (local)');
+        setPassword('');
+        // load strips
+        loadStrips();
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: email.trim().toLowerCase(),
+          password,
+        });
+
+        if (error) {
+          // Increment failed attempts
+          const newAttempts = loginAttempts + 1;
+          setLoginAttempts(newAttempts);
+          
+          // Lock after 5 failed attempts for 5 minutes
+          if (newAttempts >= 5) {
+            setLockoutTime(Date.now() + 5 * 60 * 1000);
+            toast.error("Demasiados intentos fallidos. Bloqueado por 5 minutos");
+          } else {
+            toast.error("Credenciales incorrectas");
+          }
+          throw error;
+        }
+
+        // Reset on success
+        setLoginAttempts(0);
+        setLockoutTime(null);
+        toast.success("Sesión iniciada");
+        
+        // Clear password from state
+        setPassword("");
       }
-      
-      // Reset on success
-      setLoginAttempts(0);
-      setLockoutTime(null);
-      toast.success("Sesión iniciada");
-      
-      // Clear password from state
-      setPassword("");
     } catch (error: any) {
       // Error already handled above
     } finally {
@@ -168,6 +220,16 @@ const Admin = () => {
   };
 
   const handleLogout = async () => {
+    if (useLocal) {
+      window.localStorage.removeItem('local_admin_token');
+      window.localStorage.removeItem('local_admin_email');
+      setLocalToken(null);
+      setIsAdmin(false);
+      setUser(null);
+      toast.success('Sesión cerrada (local)');
+      return;
+    }
+
     await supabase.auth.signOut();
     setIsAdmin(false);
     toast.success("Sesión cerrada");
@@ -175,6 +237,15 @@ const Admin = () => {
 
   const loadStrips = async () => {
     try {
+      if (useLocal) {
+        const base = import.meta.env.BASE_URL || '/';
+        const res = await fetch(`${base}data/strips.json`);
+        if (!res.ok) throw new Error('No se pudo cargar strips.json');
+        const json = await res.json();
+        setStrips(json.strips || []);
+        return;
+      }
+
       const { data, error } = await supabase
         .from("comic_strips")
         .select("*")
@@ -183,7 +254,7 @@ const Admin = () => {
       if (error) throw error;
       setStrips(data || []);
     } catch (error: any) {
-      toast.error("Error al cargar tiras: " + error.message);
+      toast.error("Error al cargar tiras: " + (error.message || error));
     }
   };
 
@@ -230,7 +301,43 @@ const Admin = () => {
     setUploading(true);
 
     try {
-      // Determine media type
+      if (useLocal) {
+        if (destination === 'pdf') {
+          const fd = new FormData();
+          fd.append('file', selectedFile as File);
+          fd.append('title', sanitizedTitle);
+          fd.append('publishDate', publishDate);
+
+          const res = await fetch('/api/upload-pdf', { method: 'POST', body: fd });
+          const j = await res.json();
+          if (!res.ok) throw new Error(j.error || 'Upload failed');
+          toast.success('PDF subido y registrado (local)');
+          setTitle('');
+          setPublishDate(new Date().toISOString().split('T')[0]);
+          setSelectedFile(null);
+          return;
+        }
+
+        // strip or video
+        const fd = new FormData();
+        fd.append('file', selectedFile as File);
+        fd.append('title', sanitizedTitle);
+        fd.append('publishDate', publishDate);
+        fd.append('destination', destination);
+
+        const res = await fetch('/api/upload-strip', { method: 'POST', body: fd });
+        const j = await res.json();
+        if (!res.ok) throw new Error(j.error || 'Upload failed');
+        // Prepend new strip
+        setStrips(prev => [j.newStrip, ...(prev || [])]);
+        toast.success('Subida completada (local)');
+        setTitle('');
+        setPublishDate(new Date().toISOString().split('T')[0]);
+        setSelectedFile(null);
+        return;
+      }
+
+      // Fallback: download file and give manual instructions
       const mediaType = isVideoFile(selectedFile) ? 'video' : 'image';
       const fileExt = selectedFile.name.split('.').pop()?.toLowerCase();
       const timestamp = Date.now();
@@ -306,6 +413,18 @@ O simplemente ejecuta:
     if (!confirm("¿Eliminar esta tira?")) return;
 
     try {
+      if (useLocal) {
+        const res = await fetch('/api/delete-strip', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: strip.id })
+        });
+        if (!res.ok) throw new Error('delete failed');
+        setStrips(prev => (prev || []).filter(s => s.id !== strip.id));
+        toast.success('Tira eliminada (local)');
+        return;
+      }
+
       // Extract filename from URL
       const urlParts = (strip.image_url || '').split('/');
       const fileName = urlParts[urlParts.length - 1];
@@ -481,9 +600,17 @@ O simplemente ejecuta:
                 <label className="block text-sm font-medium mb-2 uppercase tracking-wider">
                   Imagen o Video de la Tira
                 </label>
+                <div className="mb-2">
+                  <label className="text-xs mr-2">Destino:</label>
+                  <select value={destination} onChange={(e) => setDestination(e.target.value as any)} className="border-2 border-primary p-2 rounded">
+                    <option value="strip">Tira (imagen)</option>
+                    <option value="video">Buzón (video)</option>
+                    <option value="pdf">Archivo (PDF)</option>
+                  </select>
+                </div>
                 <Input
                   type="file"
-                  accept="image/*,video/*"
+                  accept={destination === 'pdf' ? 'application/pdf' : 'image/*,video/*'}
                   onChange={handleFileChange}
                   className="border-2 border-primary"
                   required
