@@ -1,14 +1,6 @@
 {
   "strips": [
     {
-      "id": "strip-022",
-      "title": "Prueba",
-      "image_url": "/Porterias/strips/strip-1765733659606-0xkm7ww.txt",
-      "video_url": null,
-      "media_type": "image",
-      "publish_date": "2025-12-14"
-    },
-    {
       "id": "local-021",
       "title": "Tira del Día",
       "image_url": "/Porterias/strips/strip-020.png",
