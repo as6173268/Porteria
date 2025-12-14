@@ -1,0 +1,59 @@
+name: Build and Deploy to Porteria GH-Pages
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pillow
+
+      - name: Install npm dependencies
+        run: npm ci
+        working-directory: Porterias
+
+      - name: Build project
+        run: npm run build
+        working-directory: Porterias
+
+      - name: Prepare deploy commit
+        run: |
+          cd Porterias/dist
+          git init
+          git add -A
+          git commit -m "gh-pages: deploy from workflow"
+
+      - name: Push to target repo gh-pages
+        env:
+          TARGET_REPO_PAT: ${{ secrets.TARGET_REPO_PAT }}
+        run: |
+          cd Porterias/dist
+          git remote add target https://x-access-token:${TARGET_REPO_PAT}@github.com/as6173268/Porteria.git
+          # Force push to gh-pages branch
+          git push --force target HEAD:gh-pages
+
+      - name: Cleanup
+        run: |
+          rm -rf Porterias/dist/.git || true
